@@ -13,7 +13,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
-import datetime
+from datetime import datetime
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -44,9 +44,10 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
-    genres = db.Column(db.String(120), nullable=True, default='')
+    genres = db.Column(db.ARRAY(db.String()),nullable=True, default='{}')
     seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String(500), nullable=True, default='')
+    website = db.Column(db.String(250),nullable=True,default='')
     shows = db.relationship('Show', backref='Venue', lazy=True)
 
 class Artist(db.Model):
