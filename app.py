@@ -26,8 +26,6 @@ db = SQLAlchemy(app)
 
 
 # TODO: connect to a local postgresql database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/fyyur'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 # Models.
@@ -226,22 +224,37 @@ def create_venue_submission():
   if error:
     abort(500)
     # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    flash('Venue ' + request.form['name'] + ' can not inseteded')
     # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   else:
-    flash('Venue ' + request.form['name'] + ' can not inseteded')
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  error = False
+  try:
+    venue = Venue.query.get(venue_id)
+    db.session.delete(venue)
+    db.session.commit()
+  except():
+      db.session.rollback()
+      error = True
+      print(sys.exc_info())
+  finally:
+      db.session.close()
+  if error:
+    abort(500)
+    flash('cannot delete it')
+  else:
+    flash('deleted successfully')
+  return redirect(url_for('venues'))
 
 #  Artists
 #  ----------------------------------------------------------------
