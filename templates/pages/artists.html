@@ -19,22 +19,7 @@
 		<a href="/artists/{{ artist.id }}/edit">
 			<i class="fas fa-pen"></i>
 		</a>
-		<button data-id="{{ artist.id }}">
-			<i class="fas fa-trash"></i>
-		</button>
 	</li>
 	{% endfor %}
 </ul>
-<script>
-	const deleteBtns = document.querySelectorAll('.delete-button');
-    for (let i = 0; i < deleteBtns.length; i++) {
-      const deleteBtn = deleteBtns[i];
-      deleteBtn.onclick = function (e) {
-        const venueId = e.target.dataset['id'];
-        fetch('/artists/' + venueId, {
-          method: 'DELETE'
-        });
-      }
-    }
-</script>
 {% endblock %}
