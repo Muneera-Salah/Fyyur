@@ -196,6 +196,10 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  # on successful db insert, flash success
+  # TODO: on unsuccessful db insert, flash an error instead.
+  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   error = False
   body = {}
   try:
@@ -225,11 +229,7 @@ def create_venue_submission():
     db.session.close()
   if error:
     abort(500)
-    # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' can not inseteded')
-    # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   else:
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   return render_template('pages/home.html')
@@ -486,11 +486,43 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-
+  
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/ 
+   
+  error = False
+  body = {}
+  try:
+    name = request.form.get('name','')
+    city = request.form.get('city','')
+    state = request.form.get('state','')
+    phone = request.form.get('phone','')
+    image_link = request.form.get('image_link','')
+    genres=request.form.getlist('genres')
+    facebook_link = request.form.get('facebook_link','')
+    seeking_description = request.form.get('seeking_description','')
+    if seeking_description:
+      seeking_talent = True
+    else:
+      seeking_talent = False
+    website = request.form.get('website','')
+    artist = Artist(name=name,city=city,state=state,phone=phone,image_link=image_link,facebook_link=facebook_link,genres=genres,seeking_talent=seeking_talent,seeking_description=seeking_description,website=website)
+    db.session.add(artist)
+    db.session.commit()
+    body['id'] = artist.id
+  except():
+    db.session.rollback()
+    error = True
+    print(sys.exc_info)
+  finally:
+    db.session.close()
+  if error:
+    abort(500)
+    flash('An error occurred. Artist ' + request.form['name']+ ' could not be listed.')
+  else:
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
   return render_template('pages/home.html')
 
 
